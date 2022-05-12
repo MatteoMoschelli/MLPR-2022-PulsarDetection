@@ -48,3 +48,14 @@ def heatmap(D, L):
     plt.figure()
     seaborn.heatmap(np.corrcoef(D[:, L==1]), linewidth=0.2, cmap="Blues", square=True, cbar=False)
     return
+
+def plotDCF(x, y, x_label, y_label):
+    plt.figure()
+    plt.plot(x, y[0], label='minDCF (pi=0.5)', color='r')
+    plt.plot(x, y[1], label='minDCF (pi=0.9)', color='b')
+    plt.plot(x, y[2], label='minDCF (pi=0.1)', color='g')
+    plt.xscale("log")
+    plt.xlim([min(x), max(x)])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.legend(["minDCF (pi=0.5)", "minDCF (pi=0.9)", "minDCF (pi=0.1)"])

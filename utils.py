@@ -135,3 +135,35 @@ def KFold(D, L, model, K=5, prior=0.5):
         print("K cannot be <=1")
     return
 
+def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
+    if (K>1):
+        folds, labels = split_db_KFold(D, L, seed=0, K=K)
+        orderedLabels = []
+        scores = []
+        for i in range(K):
+            trainingSet = []
+            labelsOfTrainingSet = []
+            for j in range(K):
+                if j!=i:
+                    trainingSet.append(folds[j])
+                    labelsOfTrainingSet.append(labels[j])
+            evaluationSet = folds[i]
+            orderedLabels.append(labels[i])
+            trainingSet=np.hstack(trainingSet)
+            labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
+            model.train(trainingSet, labelsOfTrainingSet, lambd, pi_T)
+            scores.append(model.predictAndGetScores(evaluationSet))
+        scores=np.hstack(scores)
+        orderedLabels=np.hstack(orderedLabels)
+        labels = np.hstack(labels)
+        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+    else:
+        print("K cannot be <=1")
+    return
+
+#shuffle an input dataset and the corresponding labels
+def shuffle_data(D, L, seed = 0):
+    np.random.seed(seed)
+    idx = np.random.permutation(D.shape[1])
+    
+    return D[:, idx], L[idx]

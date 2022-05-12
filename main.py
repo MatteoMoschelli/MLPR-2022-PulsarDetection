@@ -14,6 +14,7 @@ import GaussianClassifiers
 # load datasets
 
 D_train, L_train = utils.load('data/Train.txt')
+
 # preprocessing (gaussianization/Z-normalization)
 # dimensionality analysis (PCA)
 # training set analysis

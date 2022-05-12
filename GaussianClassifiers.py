@@ -24,7 +24,7 @@ class GaussianClassifier:
         self.cov0 = np.cov(D[:, L == 0])
         self.cov1 = np.cov(D[:, L == 1])
         
-    def predictAndGetScores(self, X):
+    def compute_scores(self, X):
         like0 = logpdf_GAU_ND(X, self.mean0, self.cov0 )
         like1 = logpdf_GAU_ND(X, self.mean1, self.cov1 )
         
@@ -35,7 +35,7 @@ class GaussianClassifier:
 
 class GaussianClassifier_NaiveBayes:
     
-    def train (self, D, L):
+    def train(self, D, L):
         DTR0 = D[:, L==0] #training samples of class 0
         DTR1 = D[:, L==1] #training samples of class 1
         
@@ -45,7 +45,7 @@ class GaussianClassifier_NaiveBayes:
         self.cov0 = np.multiply(np.cov(D[:, L == 0]), np.eye(DTR0.shape[0]))
         self.cov1 = np.multiply(np.cov(D[:, L == 1]), np.eye(DTR1.shape[0]))
     
-    def predictAndGetScores (self, X):
+    def compute_scores(self, X):
         like0 = logpdf_GAU_ND(X, self.mean0, self.cov0 )
         like1 = logpdf_GAU_ND(X, self.mean1, self.cov1 )
         
@@ -55,7 +55,7 @@ class GaussianClassifier_NaiveBayes:
     
 class GaussianClassifier_TiedCovariances:
     
-    def train (self, D, L):
+    def train(self, D, L):
         DTR0 = D[:, L==0] #training samples of class 0
         DTR1 = D[:, L==1] #training samples of class 1
         
@@ -67,7 +67,7 @@ class GaussianClassifier_TiedCovariances:
 
         self.cov = 1/(D.shape[1]) * (DTR0.shape[1] * self.cov0 + DTR1.shape[1] * self.cov1)         
         
-    def predictAndGetScores (self, X):
+    def compute_scores(self, X):
         like0 = logpdf_GAU_ND(X, self.mean0, self.cov )
         like1 = logpdf_GAU_ND(X, self.mean1, self.cov )
         
