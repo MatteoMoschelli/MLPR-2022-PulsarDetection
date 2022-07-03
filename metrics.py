@@ -52,7 +52,7 @@ def compute_minDCF(llr, LTE, pi1, cfn, cfp):
         
     index = np.argmin(NDCF)
     
-    return NDCF[index]
+    return round(NDCF[index],3)
 
 def compute_actDCF(llr, LTE, pi1, cfn, cfp):
     
@@ -63,4 +63,4 @@ def compute_actDCF(llr, LTE, pi1, cfn, cfp):
         
     NDCF=(normalized_detection_cost_function(uDCF, pi1, cfn, cfp))
         
-    return NDCF
+    return round(NDCF,3)

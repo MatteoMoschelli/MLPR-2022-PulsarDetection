@@ -27,19 +27,6 @@ def plotFeatures(D, L, featuresNames, classesNames):
     for i in range(D.shape[0]):
         custom_hist(i, featuresNames[i], D, L, classesNames)
 
-
-def plotDCF(x, y, xlabel):
-    plt.figure()
-    plt.plot(x, y[0:len(x)], label='min DCF prior=0.5', color='b')
-    plt.plot(x, y[len(x): 2*len(x)], label='min DCF prior=0.9', color='r')
-    plt.plot(x, y[2*len(x): 3*len(x)], label='min DCF prior=0.1', color='g')
-    plt.xlim([min(x), max(x)])
-    plt.xscale("log")
-    plt.legend(["min DCF prior=0.5", "min DCF prior=0.9", "min DCF prior=0.1"])
-    plt.xlabel(xlabel)
-    plt.ylabel("min DCF")
-    return
-
 def heatmap(D, L):
     plt.figure()
     seaborn.heatmap(np.corrcoef(D), linewidth=0.2, cmap="Greys", square=True, cbar=False)
@@ -59,3 +46,25 @@ def plotDCF(x, y, x_label, y_label):
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.legend(["minDCF (pi=0.5)", "minDCF (pi=0.9)", "minDCF (pi=0.1)"])
+
+def plotDCF_poly(x, y, xlabel, ylabel):
+    plt.figure()
+    plt.plot(x, y[0], label='minDCF (pi=0.5) c=0.1', color='r')
+    plt.plot(x, y[1], label='minDCF (pi=0.5) c=1', color='b')
+    plt.plot(x, y[2], label='minDCF (pi=0.5) c=10', color='g')
+    plt.xscale("log")
+    plt.xlim([min(x), max(x)])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend(["minDCF (pi=0.5) c=0.1", "minDCF (pi=0.5) c=1", "minDCF (pi=0.5) c=10"])
+    
+def plotDCF_RBF(x, y, xlabel, ylabel):
+    plt.figure()
+    plt.plot(x, y[0], label='minDCF (pi=0.5) logγ=-5', color='r')
+    plt.plot(x, y[1], label='minDCF (pi=0.5) logγ=-4', color='b')
+    plt.plot(x, y[2], label='minDCF (pi=0.5) logγ=-3', color='g')
+    plt.xscale("log")
+    plt.xlim([min(x), max(x)])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend(["minDCF (pi=0.5) logγ=-5", "minDCF (pi=0.5) logγ=-4", "minDCF (pi=0.5) logγ=-3"])

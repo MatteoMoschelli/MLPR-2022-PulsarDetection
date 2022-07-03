@@ -12,6 +12,7 @@ import utils
 import metrics
 import plots
 import LogisticRegression
+import SupportVectorMachines
 
 priors = [0.5, 0.9, 0.1]
 
@@ -22,12 +23,12 @@ def linear_LR_tuning(D, L, mode = 'singleFold'):
         KFold: compute minDCF with KFold cross-validation
     '''
         
-    model = LogisticRegression.LogisticRegression()
+    model = LogisticRegression.LinearLR()
     lambdas = np.logspace(-5, 5, 50)
     
-    if(mode == 'KFold'):
+    if mode == 'KFold':
         minDCF = [([utils.KFoldLR(D, L, model, l, K = 5, prior = p) for p in priors], l) for l in tqdm(lambdas)]
-    elif(mode == 'singleFold'):
+    elif mode == 'singleFold' :
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
         minDCF = []
         
@@ -55,3 +56,175 @@ def linear_LR_tuning(D, L, mode = 'singleFold'):
     plots.plotDCF(lambdas, (y0, y1, y2), "λ", "min DCF")
   
     return results[1]
+
+
+def quadratic_LR_tuning(D, L, mode = 'singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = LogisticRegression.QuadraticLR()
+    lambdas = np.logspace(-5, 5, 50)
+    
+    if mode == 'KFold':
+        minDCF = [([utils.KFoldLR(D, L, model, l, K = 5, prior = p) for p in priors], l) for l in tqdm(lambdas)]
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for l in tqdm(lambdas):
+            model.train(DTR, LTR, l, prior = 0.5)
+            scores = model.predictAndGetScores(DTE)
+            
+            minDCF.append(([metrics.compute_minDCF(scores, LTE, p, 1, 1) for p in priors], l))
+    else:
+        print("Invalid parameter: mode")
+        return
+    
+    results = min(minDCF, key=lambda t: t[0][0])
+    
+    print(f"Result on minimum DCF over 0.5 application:\n\
+          selected lambda: {results[1]}\n\
+          prior = 0.5, minDCF {results[0][0]}\n\
+          prior = 0.1, minDCF {results[0][1]}\n\
+          prior = 0.9, minDCF {results[0][2]}\n")
+    
+    y0 = [minDCF[i][0][0] for i in range(len(minDCF))]
+    y1 = [minDCF[i][0][1] for i in range(len(minDCF))]
+    y2 = [minDCF[i][0][2] for i in range(len(minDCF))]
+    
+    plots.plotDCF(lambdas, (y0, y1, y2), "λ", "min DCF")
+  
+    return results[1]
+
+def balanced_linear_SVM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = SupportVectorMachines.BalancedLinearSVM()
+    C_params = np.logspace(-5, -2, 30)
+    
+    if mode == 'KFold':
+        minDCF = [([utils.KFoldSVM(D, L, model, C, K = 5, prior = p) for p in priors], C) for C in tqdm(C_params)]
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for C in tqdm(C_params):
+            model.train(DTR, LTR, C)
+            scores = model.predictAndGetScores(DTE)
+            
+            minDCF.append(([metrics.compute_minDCF(scores, LTE, p, 1, 1) for p in priors], C))
+    else:
+        print("Invalid parameter: mode")
+        return
+    
+    results = min(minDCF, key=lambda t: t[0][0])
+    
+    print(f"Result on minimum DCF over 0.5 application:\n\
+          selected C: {results[1]}\n\
+          prior = 0.5, minDCF {results[0][0]}\n\
+          prior = 0.1, minDCF {results[0][1]}\n\
+          prior = 0.9, minDCF {results[0][2]}\n")
+    
+    y0 = [minDCF[i][0][0] for i in range(len(minDCF))]
+    y1 = [minDCF[i][0][1] for i in range(len(minDCF))]
+    y2 = [minDCF[i][0][2] for i in range(len(minDCF))]
+    
+    plots.plotDCF(C_params, (y0, y1, y2), "C", "min DCF")
+    
+    return results[1]
+
+def balanced_poly_SVM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = SupportVectorMachines.BalancedQuadraticSVM()
+    C_params = np.logspace(-5, -2, 20)
+    c_params = [0, 1, 10]
+    
+    if mode == 'KFold':
+        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='poly', C=C, K=5, prior=0.5, c=c_i) for c_i in c_params], C) for C in tqdm(C_params)], dtype=object)
+
+    
+        y0 = [minDCF[i][0][0] for i in range(len(C_params))]
+        y1 = [minDCF[i][0][1] for i in range(len(C_params))]
+        y2 = [minDCF[i][0][2] for i in range(len(C_params))]
+        #y3 = [minDCF[i][0][3] for i in range(len(C_params))]
+        
+        plots.plotDCF_poly(C_params, (y0, y1, y2), "C", "min DCF")
+        
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for c in c_params:
+            for C in tqdm(C_params):
+                model.train(DTR, LTR, kernel='poly', C=C, c=c)
+                scores = model.predictAndGetScores(DTE)
+                
+                minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+                
+        y0 = minDCF[0:len(C_params)]
+        y1 = minDCF[len(C_params):2*len(C_params)]
+        y2 = minDCF[2*len(C_params):3*len(C_params)]
+        
+        plots.plotDCF_poly(C_params, (y0, y1, y2), "C", "min DCF")
+    else:
+        print("Invalid parameter: mode")
+        return
+
+
+def balanced_RBF_SVM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = SupportVectorMachines.BalancedQuadraticSVM()
+    C_params = np.logspace(-5, -2, 20)
+    gamma_params = [1e-5, 1e-4, 1e-3]
+    
+    if mode == 'KFold':
+        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='RBF', C=C, K=5, prior=0.5, gamma=gamma_i) for gamma_i in gamma_params], C) for C in tqdm(C_params)], dtype=object)
+
+    
+        y0 = [minDCF[i][0][0] for i in range(len(C_params))]
+        y1 = [minDCF[i][0][1] for i in range(len(C_params))]
+        y2 = [minDCF[i][0][2] for i in range(len(C_params))]
+        #y3 = [minDCF[i][0][3] for i in range(len(C_params))]
+        
+        plots.plotDCF_RBF(C_params, (y0, y1, y2), "C", "min DCF")
+        
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for gamma in gamma_params:
+            for C in tqdm(C_params):
+                model.train(DTR, LTR, kernel='RBF', C=C, gamma=gamma)
+                scores = model.predictAndGetScores(DTE)
+                
+                minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+                
+        y0 = minDCF[0:len(C_params)]
+        y1 = minDCF[len(C_params):2*len(C_params)]
+        y2 = minDCF[2*len(C_params):3*len(C_params)]
+        
+        plots.plotDCF_RBF(C_params, (y0, y1, y2), "C", "min DCF")
+    else:
+        print("Invalid parameter: mode")
+        return
+    
+    
+    
+    

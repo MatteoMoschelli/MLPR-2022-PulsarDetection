@@ -72,6 +72,12 @@ def covMatrix(Data):
     C = (1/DC.shape[1]) * np.dot(DC, DC.T)
     return DC, C
 
+def constrainCov(C, psi = 0.01):
+    U, s, Vh = np.linalg.svd(C)
+    s[s < psi] = psi
+    C = np.dot(U, vcol(s)*U.T)
+    return C
+
 # Apply Gaussianization to D, using ranks based on training data TD
 def Gaussianization(TD, D):
     if (TD.shape[0]!=D.shape[0]):
@@ -135,7 +141,7 @@ def KFold(D, L, model, K=5, prior=0.5):
         print("K cannot be <=1")
     return
 
-def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
+def KFoldLR(D, L, model, lambd, K=5, prior=0.5, pi_T=0.5):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -160,6 +166,88 @@ def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
     else:
         print("K cannot be <=1")
     return
+
+def KFoldSVM(D, L, model, C, K=5, prior=0.5, pi_T=0.5):
+    if K > 1:
+        folds, labels = split_db_KFold(D, L, seed=0, K=K)
+        orderedLabels = []
+        scores = []
+        for i in range(K):
+            trainingSet = []
+            labelsOfTrainingSet = []
+            for j in range(K):
+                if j!=i:
+                    trainingSet.append(folds[j])
+                    labelsOfTrainingSet.append(labels[j])
+            evaluationSet = folds[i]
+            orderedLabels.append(labels[i])
+            trainingSet=np.hstack(trainingSet)
+            labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
+            
+            model.train(trainingSet, labelsOfTrainingSet, C)
+            scores.append(model.predictAndGetScores(evaluationSet))
+        scores=np.hstack(scores)
+        orderedLabels=np.hstack(orderedLabels)
+        labels = np.hstack(labels)
+        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+    else:
+        print("K cannot be <= 1")
+        return 
+
+def KFoldSVM_kernel(D, L, model, kernel, C, K=5, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0):
+    if K > 1:
+        folds, labels = split_db_KFold(D, L, seed=0, K=K)
+        orderedLabels = []
+        scores = []
+        for i in range(K):
+            trainingSet = []
+            labelsOfTrainingSet = []
+            for j in range(K):
+                if j!=i:
+                    trainingSet.append(folds[j])
+                    labelsOfTrainingSet.append(labels[j])
+            evaluationSet = folds[i]
+            orderedLabels.append(labels[i])
+            trainingSet=np.hstack(trainingSet)
+            labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
+            
+            model.train(trainingSet, labelsOfTrainingSet, kernel='poly', C=C, c=c, p_t=pi_T)
+            scores.append(model.predictAndGetScores(evaluationSet))
+        scores=np.hstack(scores)
+        orderedLabels=np.hstack(orderedLabels)
+        labels = np.hstack(labels)
+        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+    else:
+        print("K cannot be <= 1")
+        return 
+
+def KFoldGMM(D, L, model, K=5, M=1, prior=0.5):
+    if K > 1:
+        folds, labels = split_db_KFold(D, L, seed=0, K=K)
+        orderedLabels = []
+        scores = []
+        for i in range(K):
+            trainingSet = []
+            labelsOfTrainingSet = []
+            for j in range(K):
+                if j!=i:
+                    trainingSet.append(folds[j])
+                    labelsOfTrainingSet.append(labels[j])
+            evaluationSet = folds[i]
+            orderedLabels.append(labels[i])
+            trainingSet=np.hstack(trainingSet)
+            labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
+            
+            model.train(trainingSet, labelsOfTrainingSet, M)
+            scores.append(model.predictAndGetScores(evaluationSet))
+        scores=np.hstack(scores)
+        orderedLabels=np.hstack(orderedLabels)
+        labels = np.hstack(labels)
+        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+    else:
+        print("K cannot be <= 1")
+        return
+    
 
 #shuffle an input dataset and the corresponding labels
 def shuffle_data(D, L, seed = 0):
