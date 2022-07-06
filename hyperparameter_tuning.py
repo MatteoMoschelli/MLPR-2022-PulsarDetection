@@ -13,6 +13,7 @@ import metrics
 import plots
 import LogisticRegression
 import SupportVectorMachines
+import GaussianMixtureModels
 
 priors = [0.5, 0.9, 0.1]
 
@@ -24,10 +25,10 @@ def linear_LR_tuning(D, L, mode = 'singleFold'):
     '''
         
     model = LogisticRegression.LinearLR()
-    lambdas = np.logspace(-5, 5, 50)
+    lambdas = np.logspace(-5, 2, 30)
     
     if mode == 'KFold':
-        minDCF = [([utils.KFoldLR(D, L, model, l, K = 5, prior = p) for p in priors], l) for l in tqdm(lambdas)]
+        minDCF = [([utils.KFoldLR(D, L, model, l, K = 3, prior = p) for p in priors], l) for l in tqdm(lambdas)]
     elif mode == 'singleFold' :
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
         minDCF = []
@@ -66,10 +67,10 @@ def quadratic_LR_tuning(D, L, mode = 'singleFold'):
     '''
     
     model = LogisticRegression.QuadraticLR()
-    lambdas = np.logspace(-5, 5, 50)
+    lambdas = np.logspace(-5, 2, 30)
     
     if mode == 'KFold':
-        minDCF = [([utils.KFoldLR(D, L, model, l, K = 5, prior = p) for p in priors], l) for l in tqdm(lambdas)]
+        minDCF = [([utils.KFoldLR(D, L, model, l, K = 3, prior = p) for p in priors], l) for l in tqdm(lambdas)]
     elif mode == 'singleFold':
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
         minDCF = []
@@ -110,7 +111,7 @@ def balanced_linear_SVM_tuning(D, L, mode='singleFold'):
     C_params = np.logspace(-5, -2, 30)
     
     if mode == 'KFold':
-        minDCF = [([utils.KFoldSVM(D, L, model, C, K = 5, prior = p) for p in priors], C) for C in tqdm(C_params)]
+        minDCF = [([utils.KFoldSVM(D, L, model, C, K = 3, prior = p) for p in priors], C) for C in tqdm(C_params)]
     elif mode == 'singleFold':
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
         minDCF = []
@@ -152,7 +153,7 @@ def balanced_poly_SVM_tuning(D, L, mode='singleFold'):
     c_params = [0, 1, 10]
     
     if mode == 'KFold':
-        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='poly', C=C, K=5, prior=0.5, c=c_i) for c_i in c_params], C) for C in tqdm(C_params)], dtype=object)
+        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='poly', C=C, K=3, prior=0.5, c=c_i) for c_i in c_params], C) for C in tqdm(C_params)], dtype=object)
 
     
         y0 = [minDCF[i][0][0] for i in range(len(C_params))]
@@ -195,7 +196,7 @@ def balanced_RBF_SVM_tuning(D, L, mode='singleFold'):
     gamma_params = [1e-5, 1e-4, 1e-3]
     
     if mode == 'KFold':
-        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='RBF', C=C, K=5, prior=0.5, gamma=gamma_i) for gamma_i in gamma_params], C) for C in tqdm(C_params)], dtype=object)
+        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='RBF', C=C, K=3, prior=0.5, gamma=gamma_i) for gamma_i in gamma_params], C) for C in tqdm(C_params)], dtype=object)
 
     
         y0 = [minDCF[i][0][0] for i in range(len(C_params))]
@@ -225,6 +226,84 @@ def balanced_RBF_SVM_tuning(D, L, mode='singleFold'):
         print("Invalid parameter: mode")
         return
     
+def GMM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
     
+    model = GaussianMixtureModels.GMM()
+    M_params = [1,2,4,8,16,32,64,128,256,512]
     
+    if mode == 'KFold':
+        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for M in tqdm(M_params):
+            model.train(DTR, LTR, M)
+            scores = model.predictAndGetScores(DTE)
+            
+            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+    else:
+        print("Invalida parameter: mode")
+        return
+    
+    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
+    
+def diag_GMM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = GaussianMixtureModels.GMMDiag()
+    M_params = [1,2,4,8,16,32,64,128,256,512]
+    
+    if mode == 'KFold':
+        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for M in tqdm(M_params):
+            model.train(DTR, LTR, M)
+            scores = model.predictAndGetScores(DTE)
+            
+            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+    else:
+        print("Invalida parameter: mode")
+        return
+    
+    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
+    
+def tied_GMM_tuning(D, L, mode='singleFold'):
+    '''
+    values for "mode": 
+        singleFold: compute minDCF with single fold\n
+        KFold: compute minDCF with KFold cross-validation
+    '''
+    
+    model = GaussianMixtureModels.GMMTiedCov()
+    M_params = [1,2,4,8,16,32,64,128,256,512]
+    
+    if mode == 'KFold':
+        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+    elif mode == 'singleFold':
+        (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
+        minDCF = []
+        
+        for M in tqdm(M_params):
+            model.train(DTR, LTR, M)
+            scores = model.predictAndGetScores(DTE)
+            
+            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+    else:
+        print("Invalida parameter: mode")
+        return
+    
+    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
     

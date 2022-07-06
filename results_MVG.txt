@@ -1,0 +1,38 @@
+Starting Gaussian Classifiers analysis:
+
+	Single Fold approach
+
+		Z-norm | no PCA
+			Full covariance -->  0.11 0.63 0.281
+			Diag covariance -->  0.183 0.619 0.28
+			Tied covariance -->  0.108 0.522 0.21
+		Z-norm | PCA(m=7)
+			Full covariance -->  0.114 0.597 0.285
+			Diag covariance -->  0.193 0.64 0.499
+			Tied covariance -->  0.109 0.521 0.216
+		Z-norm | PCA(m=6)
+			Full covariance -->  0.113 0.594 0.286
+			Diag covariance -->  0.203 0.677 0.515
+			Tied covariance -->  0.11 0.585 0.255
+		Z-norm | PCA(m=5)
+			Full covariance -->  0.135 0.581 0.262
+			Diag covariance -->  0.195 0.636 0.459
+			Tied covariance -->  0.126 0.561 0.262
+	K-Fold approach
+
+		Z-norm | no PCA
+			Full covariance -->  [0.142, 0.662, 0.285]
+			Diag covariance -->  [0.192, 0.732, 0.313]
+			Tied covariance -->  [0.112, 0.573, 0.224]
+		Z-norm | PCA(m=7)
+			Full covariance -->  [0.139, 0.631, 0.302]
+			Diag covariance -->  [0.214, 0.721, 0.504]
+			Tied covariance -->  [0.112, 0.569, 0.224]
+		Z-norm | PCA(m=6)
+			Full covariance -->  [0.151, 0.632, 0.286]
+			Diag covariance -->  [0.222, 0.722, 0.531]
+			Tied covariance -->  [0.138, 0.578, 0.256]
+		Z-norm | PCA(m=5)
+			Full covariance -->  [0.149, 0.636, 0.25]
+			Diag covariance -->  [0.219, 0.742, 0.459]
+			Tied covariance -->  [0.149, 0.574, 0.261]

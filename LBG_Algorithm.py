@@ -21,10 +21,18 @@ def split(GMM, alpha = 0.1):
     return splittedGMM
 
 def LBG(GMM, X, iterations):
-    GMM = EM_Algorithm.EMalgorithm(X, GMM)
-    for i in range(iterations):
+    # GMM = EM_Algorithm.EMalgorithm(X, GMM)
+    # for i in range(iterations):
+    #     GMM = split(GMM)
+    #     print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
+    #     GMM = EM_Algorithm.EMalgorithm(X, GMM)
+    while True:
         GMM = split(GMM)
+        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.EMalgorithm(X, GMM)
+        
+        if(len(GMM) >= iterations):
+            break
     return GMM
 
 def DiagLBG(GMM, X, iterations):

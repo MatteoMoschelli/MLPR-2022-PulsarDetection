@@ -13,6 +13,8 @@ import hyperparameter_tuning
 import LogisticRegression
 import SupportVectorMachines
 import GaussianMixtureModels
+import numpy as np
+import plots
 
 
 D, L = utils.load('../WineQualityDetection/Train.txt')
@@ -34,9 +36,23 @@ D = PCA.compute_PCA(D_gauss,10)
 #hyperparameter_tuning.balanced_RBF_SVM_tuning(D, L, mode='KFold')
 #hyperparameter_tuning.balanced_RBF_SVM_tuning(D, L, mode='singleFold')
 
-#hyperparameter_tuning.balanced_linear_SVM_tuning(D, L, mode='KFold')
+# def load_GMM_DCFs(filename_gauss):
+#     file = open(filename_gauss,'r')
+    
+#     DCFs_list = []
+#     for line in file:
+#         fields = line.split(',')
+#         DCFs_list.append(float(fields[1]))
+#     file.close()
+    
+#     DCFs_gauss = np.array(DCFs_list)
+    
+    
+    
+#     return DCFs_gauss
 
-GMM1 = GaussianMixtureModels.GMM()
-GMM1.train(D,L,M=4)
-s = GMM1.predictAndGetScores(DTE)
-print(utils.metrics.compute_minDCF(s,LTE,0.5,1,1))
+# DCFs_gauss = load_GMM_DCFs('GMM_dcf_gauss.txt')
+# M_params = [1,2,4,8,16,32,62,128,256,512]
+# plots.plotDCF_GMM(M_params, DCFs_gauss, "M", "min DCF")
+
+hyperparameter_tuning.GMM_tuning(D, L, 'singleFold')

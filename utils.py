@@ -8,11 +8,25 @@ Created on Tue Apr 19 13:47:32 2022
 import numpy as np
 from scipy.stats import norm
 import metrics
+from tqdm import tqdm
 
 # -------------------- CONSTANTS ---------------------
 
-classesNames = []
-featuresNames = []
+classesNames = [
+    'RFI/noise',
+    'real pulsar'
+    ]
+featuresNames = [
+    'Mean of the integrated profile',
+	'Standard deviation of the integrated profile',
+	'Excess kurtosis of the integrated profile',
+	'Skewness of the integrated profile',
+	'Mean of the DM-SNR curve',
+	'Standard deviation of the DM-SNR curve',
+	'Excess kurtosis of the DM-SNR curve',
+	'Skewness of the DM-SNR curve'
+	]
+priors = [0.5, 0.9, 0.1]
 
 # ----------------- UTILITY FUNCTIONS -----------------
 
@@ -92,6 +106,13 @@ def Gaussianization(TD, D):
     y = norm.ppf(ranks)
     return y
 
+def ZNormalization(D, mean=None, standardDeviation=None):
+    if (mean is None and standardDeviation is None):
+        mean = D.mean(axis=1)
+        standardDeviation = D.std(axis=1)
+    ZD = (D-vcol(mean))/vcol(standardDeviation)
+    return ZD, mean, standardDeviation
+
 # Split the input dataset and the corresponding labels in K folds
 def split_db_KFold(D, L, seed=0, K=5):
     folds = []
@@ -110,7 +131,7 @@ def split_db_KFold(D, L, seed=0, K=5):
     return folds, labels
 
 # Apply KFold cross-validation on the input model with the input dataset
-def KFold(D, L, model, K=5, prior=0.5):
+def KFold(D, L, model, K=3, prior=0.5):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         
@@ -136,12 +157,15 @@ def KFold(D, L, model, K=5, prior=0.5):
         LTE = np.hstack(LTE)
         labels = np.hstack(labels)
         
-        return metrics.compute_minDCF(scores, LTE, prior, 1, 1)
+        minDCF = []
+        for prior in priors:
+            minDCF.append(metrics.compute_minDCF(scores, LTE, prior, 1, 1))
+        return minDCF
     else:
         print("K cannot be <=1")
     return
 
-def KFoldLR(D, L, model, lambd, K=5, prior=0.5, pi_T=0.5):
+def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -162,12 +186,16 @@ def KFoldLR(D, L, model, lambd, K=5, prior=0.5, pi_T=0.5):
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
-        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+        
+        minDCF = []
+        for prior in priors:
+            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+        return minDCF
     else:
         print("K cannot be <=1")
     return
 
-def KFoldSVM(D, L, model, C, K=5, prior=0.5, pi_T=0.5):
+def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -189,12 +217,16 @@ def KFoldSVM(D, L, model, C, K=5, prior=0.5, pi_T=0.5):
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
-        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+        
+        minDCF = []
+        for prior in priors:
+            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+        return minDCF
     else:
         print("K cannot be <= 1")
         return 
 
-def KFoldSVM_kernel(D, L, model, kernel, C, K=5, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0):
+def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -216,12 +248,16 @@ def KFoldSVM_kernel(D, L, model, kernel, C, K=5, prior=0.5, pi_T=0.5, c=0, d=2, 
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
-        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+        
+        minDCF = []
+        for prior in priors:
+            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+        return minDCF
     else:
         print("K cannot be <= 1")
         return 
 
-def KFoldGMM(D, L, model, K=5, M=1, prior=0.5):
+def KFoldGMM(D, L, model, K=3, M=1, prior=0.5):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -243,7 +279,11 @@ def KFoldGMM(D, L, model, K=5, M=1, prior=0.5):
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
-        return metrics.compute_minDCF(scores, orderedLabels, prior, 1, 1)
+        
+        minDCF = []
+        for prior in priors:
+            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+        return minDCF
     else:
         print("K cannot be <= 1")
         return

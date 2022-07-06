@@ -148,8 +148,9 @@ def EMalgorithm(X, gmm, delta=10**(-6)):
             # Update the model parameters that are in gmm
             gmm[g] = (w[g], mu[:, g].reshape((mu.shape[0], 1)), cov[g])
         # Compute the new log densities and the new sub-class conditional densities
-        logmarg= marginal_density_GMM(joint_log_density_GMM(logpdf_GMM(X, gmm), gmm) )                                                                            #aggiustare
+        logmarg= marginal_density_GMM(joint_log_density_GMM(logpdf_GMM(X, gmm), gmm) )
         loglikelihood2 = log_likelihood_GMM(logmarg, X)
+        #print("increase:",np.abs(loglikelihood2 - loglikelihood1))
         if (loglikelihood2-loglikelihood1 < delta):
             flag = False
         if (loglikelihood2-loglikelihood1 < 0):

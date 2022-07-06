@@ -1,0 +1,42 @@
+QUAD LOG-REG
+
+hyperparameter_tuning.quadratic_LR_tuning(D_train, L_train, mode = 'singleFold')
+hyperparameter_tuning.quadratic_LR_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.quadratic_LR_tuning(D_train7, L_train, mode = 'singleFold')
+hyperparameter_tuning.quadratic_LR_tuning(D_train7, L_train, mode = 'KFold')
+
+
+LINEAR SVM
+import SupportVectorMachines
+import hyperparameter_tuning
+
+D_train, L_train = utils.load('data/Train.txt')
+D_train, _, _ = utils.ZNormalization(D_train)
+D_train7 = PCA.compute_PCA(D_train, 7)
+
+hyperparameter_tuning.balanced_linear_SVM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.balanced_linear_SVM_tuning(D_train7, L_train, mode = 'KFold')
+
+
+POLY SVM
+
+hyperparameter_tuning.balanced_poly_SVM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.balanced_poly_SVM_tuning(D_train7, L_train, mode = 'KFold')
+
+
+RBF SVM
+hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train7, L_train, mode = 'KFold')
+
+GMM
+
+import GaussianMixtureModels
+
+hyperparameter_tuning.GMM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.GMM_tuning(D_train7, L_train, mode = 'KFold')
+
+hyperparameter_tuning.diag_GMM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.diag_GMM_tuning(D_train7, L_train, mode = 'KFold')
+
+hyperparameter_tuning.tied_GMM_tuning(D_train, L_train, mode = 'KFold')
+hyperparameter_tuning.tied_GMM_tuning(D_train7, L_train, mode = 'KFold')
