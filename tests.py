@@ -55,4 +55,4 @@ D = PCA.compute_PCA(D_gauss,10)
 # M_params = [1,2,4,8,16,32,62,128,256,512]
 # plots.plotDCF_GMM(M_params, DCFs_gauss, "M", "min DCF")
 
-hyperparameter_tuning.GMM_tuning(D, L, 'singleFold')
+hyperparameter_tuning.balanced_RBF_SVM_tuning(D, L, mode='singleFold')

@@ -199,7 +199,7 @@ print('\t\tZ-norm | PCA(m=5)')
 print('\t\t\tFull covariance --> ', utils.KFold(D_train5, L_train, GaussianClassifiers.GaussianClassifier()))
 print('\t\t\tDiag covariance --> ', utils.KFold(D_train5, L_train, GaussianClassifiers.GaussianClassifier_NaiveBayes()))
 print('\t\t\tTied covariance --> ', utils.KFold(D_train5, L_train, GaussianClassifiers.GaussianClassifier_TiedCovariances()))
-"""
+
 #--- Logistic Regression ---#
 
 print('Starting Logistic Regression analysis:\n')
@@ -209,6 +209,20 @@ hyperparameter_tuning.linear_LR_tuning(D_train, L_train, mode = 'singleFold')
 hyperparameter_tuning.linear_LR_tuning(D_train, L_train, mode = 'KFold')
 hyperparameter_tuning.linear_LR_tuning(D_train7, L_train, mode = 'singleFold')
 hyperparameter_tuning.linear_LR_tuning(D_train7, L_train, mode = 'KFold')
+"""
+linear_LR_lambda = 1e-5
+model_linearLR = LogisticRegression.LinearLR()
+
+print('Selected value for lambda: ', linear_LR_lambda)
+
+print('\tK-Fold approach\n')
+
+print('\t\tZ-norm | no PCA')
+print(utils.KFoldLR(D_train, L_train, model_linearLR, linear_LR_lambda))
+#---------------------------------------------------------------------------------------------------------
+
+print('\t\tZ-norm | PCA(m=7)')
+print(utils.KFoldLR(D_train7, L_train, model_linearLR, linear_LR_lambda))
 
 
 #### SVM (linear + polynomial & RBF kernel)
