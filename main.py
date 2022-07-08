@@ -216,17 +216,45 @@ model_linearLR = LogisticRegression.LinearLR()
 print('Selected value for lambda: ', linear_LR_lambda)
 
 print('\tK-Fold approach\n')
-
+"""
 print('\t\tZ-norm | no PCA')
 print(utils.KFoldLR(D_train, L_train, model_linearLR, linear_LR_lambda))
 #---------------------------------------------------------------------------------------------------------
 
 print('\t\tZ-norm | PCA(m=7)')
 print(utils.KFoldLR(D_train7, L_train, model_linearLR, linear_LR_lambda))
+"""
+# print('A')
+# hyperparameter_tuning.quadratic_LR_tuning(D_train, L_train, mode='singleFold')
+# print('B')
+# hyperparameter_tuning.quadratic_LR_tuning(D_train, L_train, mode='KFold')
+# print('C')
+# hyperparameter_tuning.quadratic_LR_tuning(D_train7, L_train, mode='singleFold')
+# print('D')
+# hyperparameter_tuning.quadratic_LR_tuning(D_train7, L_train, mode='KFold')
+# print('E')
+
+# hyperparameter_tuning.balanced_linear_SVM_tuning(D_train, L_train, mode='KFold')
+# print('F')
+# hyperparameter_tuning.balanced_linear_SVM_tuning(D_train7, L_train, mode='KFold')
+# print('G')
+
 
 
 #### SVM (linear + polynomial & RBF kernel)
 #### GMM
+print('A')
+hyperparameter_tuning.GMM_tuning(D_train, L_train, mode='KFold')
+print('B')
+hyperparameter_tuning.GMM_tuning(D_train7, L_train, mode='KFold')
+print('C')
+hyperparameter_tuning.diag_GMM_tuning(D_train, L_train, mode='KFold')
+print('D')
+hyperparameter_tuning.diag_GMM_tuning(D_train7, L_train, mode='KFold')
+print('E')
+hyperparameter_tuning.tied_GMM_tuning(D_train, L_train, mode='KFold')
+print('F')
+hyperparameter_tuning.tied_GMM_tuning(D_train7, L_train, mode='KFold')
 ## actDCF
 #### MVG
 #### LR (linear + quad)

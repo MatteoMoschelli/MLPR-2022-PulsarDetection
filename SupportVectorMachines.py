@@ -42,7 +42,7 @@ def SVM_dual_formulation(DTR, LTR, C, K, piT):
     
     b = [(0, C1) if LTR[i] == 1 else (0, C0) for i in range(DTR.shape[1])]
     
-    (x, f, d) = scipy.optimize.fmin_l_bfgs_b(SVM_obj, np.zeros(DTR.shape[1]), args=(Hij,), bounds=b, iprint=1, factr=1.0)
+    (x, f, d) = scipy.optimize.fmin_l_bfgs_b(SVM_obj, np.zeros(DTR.shape[1]), args=(Hij,), bounds=b, iprint=0, factr=1.0)
     w = np.sum((x * LTR).reshape(1, DTR.shape[1]) * D, axis=1)
     
     return w
@@ -68,7 +68,7 @@ def SVM_dual_formulation_kernel(DTR, LTR, C, K, kernel='poly', piT=0.5, c=0, d=2
     b = [(0, C1) if LTR[i] == 1 else (0, C0) for i in range(DTR.shape[1])]
     
     
-    (x, f, data) = scipy.optimize.fmin_l_bfgs_b(SVM_obj, np.zeros(DTR.shape[1]), args=(Hij,), bounds=b, iprint=1, factr=1.0)
+    (x, f, data) = scipy.optimize.fmin_l_bfgs_b(SVM_obj, np.zeros(DTR.shape[1]), args=(Hij,), bounds=b, iprint=0, factr=1.0)
     return x
 
 def poly_kernel(D, K, c, d):

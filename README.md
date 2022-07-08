@@ -3,17 +3,17 @@
 
 ## Hyperparameter tuning
 [x] linear Logistic Regression
-[ ] quadratic Logistic Regression
-[ ] linear SVM
+[x] quadratic Logistic Regression
+[x] linear SVM
 [ ] polynomial SVM
 [ ] RBF SVM
 [ ] GMM
 
 ## Training set analysis - minDCF
 [x] Multivariate Gaussian
-[ ] linear Logistic Regression
+[x] linear Logistic Regression
 [ ] quadratic Logistic Regression
-[ ] linear SVM
+[x] linear SVM
 [ ] polynomial SVM
 [ ] RBF SVM
 [ ] GMM

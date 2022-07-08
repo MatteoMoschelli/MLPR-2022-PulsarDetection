@@ -69,13 +69,23 @@ def plotDCF_RBF(x, y, xlabel, ylabel):
     plt.ylabel(ylabel)
     plt.legend(["minDCF (pi=0.5) logγ=-5", "minDCF (pi=0.5) logγ=-4", "minDCF (pi=0.5) logγ=-3"])
     
-def plotDCF_GMM(x, y, xlabel, ylabel):
-    x_values = np.linspace(2,200,10)
+def plotDCF_GMM(x, y0, y1, y2, xlabel, ylabel):
+    labels = ["2","4","8","16","32","64"]
+    x = np.arange(len(labels))
+    width = 0.35
+
+    fig, ax = plt.subplots()
     
-    plt.figure()
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.ylim([0,1.0])
-    plt.bar(x_values, y, tick_label=["1","2","4","8","16","32","64","128","256","512"], width=5, label='minDCF (pi=0.5)', color='r')
-    plt.legend()
+    
+    rects2 = ax.bar(x, y1, width, tick_label=labels, label='minDCF (pi=0.9)')
+    rects3 = ax.bar(x + width/2, y2, width, label='minDCF (pi=0.1)')
+    rects1 = ax.bar(x - width/2, y0, width, label='minDCF (pi=0.5)')
+    
+    ax.set_ylabel('min DCF')
+    ax.set_xlabel('M')
+    ax.set_xticks(x, labels)
+    ax.legend()
+    
+    fig.tight_layout()
+    
     plt.show()

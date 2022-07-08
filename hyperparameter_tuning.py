@@ -234,24 +234,42 @@ def GMM_tuning(D, L, mode='singleFold'):
     '''
     
     model = GaussianMixtureModels.GMM()
-    M_params = [1,2,4,8,16,32,64,128,256,512]
-    
+    M_params = [2,4,8,16,32,64]
+
     if mode == 'KFold':
-        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
+        
+        for M in tqdm(M_params):
+            minDCFs = np.array(utils.KFoldGMM(D, L, model, 3, M))
+            minDCF_05.append(minDCFs[0])
+            minDCF_09.append(minDCFs[1])
+            minDCF_01.append(minDCFs[2])
+        
     elif mode == 'singleFold':
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
-        minDCF = []
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
         
         for M in tqdm(M_params):
             model.train(DTR, LTR, M)
             scores = model.predictAndGetScores(DTE)
             
-            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_05.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_09.append(metrics.compute_minDCF(scores, LTE, 0.9, 1, 1))
+            minDCF_01.append(metrics.compute_minDCF(scores, LTE, 0.1, 1, 1))
     else:
-        print("Invalida parameter: mode")
+        print("Invalid parameter: mode")
         return
     
-    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
+    
+    minDCF_05 = np.array(minDCF_05)
+    minDCF_09 = np.array(minDCF_09)
+    minDCF_01 = np.array(minDCF_01)
+    
+    plots.plotDCF_GMM(M_params, minDCF_05,minDCF_09, minDCF_01, "M", "min DCF")
     
 def diag_GMM_tuning(D, L, mode='singleFold'):
     '''
@@ -261,24 +279,43 @@ def diag_GMM_tuning(D, L, mode='singleFold'):
     '''
     
     model = GaussianMixtureModels.GMMDiag()
-    M_params = [1,2,4,8,16,32,64,128,256,512]
+    M_params = [2,4,8,16,32,64]
+    
     
     if mode == 'KFold':
-        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
+        
+        for M in tqdm(M_params):
+            minDCFs = np.array(utils.KFoldGMM(D, L, model, 3, M))
+            minDCF_05.append(minDCFs[0])
+            minDCF_09.append(minDCFs[1])
+            minDCF_01.append(minDCFs[2])
+        
     elif mode == 'singleFold':
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
-        minDCF = []
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
         
         for M in tqdm(M_params):
             model.train(DTR, LTR, M)
             scores = model.predictAndGetScores(DTE)
             
-            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_05.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_09.append(metrics.compute_minDCF(scores, LTE, 0.9, 1, 1))
+            minDCF_01.append(metrics.compute_minDCF(scores, LTE, 0.1, 1, 1))
     else:
-        print("Invalida parameter: mode")
+        print("Invalid parameter: mode")
         return
     
-    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
+    
+    minDCF_05 = np.array(minDCF_05)
+    minDCF_09 = np.array(minDCF_09)
+    minDCF_01 = np.array(minDCF_01)
+    
+    plots.plotDCF_GMM(M_params, minDCF_05,minDCF_09, minDCF_01, "M", "min DCF")
     
 def tied_GMM_tuning(D, L, mode='singleFold'):
     '''
@@ -288,22 +325,40 @@ def tied_GMM_tuning(D, L, mode='singleFold'):
     '''
     
     model = GaussianMixtureModels.GMMTiedCov()
-    M_params = [1,2,4,8,16,32,64,128,256,512]
+    M_params = [2,4,8,16,32,64]
     
     if mode == 'KFold':
-        minDCF = np.array([utils.KFoldGMM(D, L, model, 3, M) for M in tqdm(M_params)], dtype=object)
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
+        
+        for M in tqdm(M_params):
+            minDCFs = np.array(utils.KFoldGMM(D, L, model, 3, M))
+            minDCF_05.append(minDCFs[0])
+            minDCF_09.append(minDCFs[1])
+            minDCF_01.append(minDCFs[2])
+        
     elif mode == 'singleFold':
         (DTR, LTR),(DTE, LTE) = utils.split_db_singleFold(D, L)
-        minDCF = []
+        minDCF_05 = []
+        minDCF_09 = []
+        minDCF_01 = []
         
         for M in tqdm(M_params):
             model.train(DTR, LTR, M)
             scores = model.predictAndGetScores(DTE)
             
-            minDCF.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_05.append(metrics.compute_minDCF(scores, LTE, 0.5, 1, 1))
+            minDCF_09.append(metrics.compute_minDCF(scores, LTE, 0.9, 1, 1))
+            minDCF_01.append(metrics.compute_minDCF(scores, LTE, 0.1, 1, 1))
     else:
-        print("Invalida parameter: mode")
+        print("Invalid parameter: mode")
         return
     
-    plots.plotDCF_GMM(M_params, minDCF, "M", "min DCF")
+    
+    minDCF_05 = np.array(minDCF_05)
+    minDCF_09 = np.array(minDCF_09)
+    minDCF_01 = np.array(minDCF_01)
+    
+    plots.plotDCF_GMM(M_params, minDCF_05,minDCF_09, minDCF_01, "M", "min DCF")
     

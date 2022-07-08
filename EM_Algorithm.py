@@ -96,7 +96,7 @@ def DiagMstep(X, S, posterior):
     cov = Sg / Zg.reshape((Zg.size, 1, 1)) - prodmu
     for g in range(S.shape[0]):
        
-        cov[g] = utils.constrainSigma(cov[g] * np.eye(cov[g].shape[0]))
+        cov[g] = utils.constrainCov(cov[g] * np.eye(cov[g].shape[0]))
     w = Zg/np.sum(Zg)
     return (w, mu, cov)
 

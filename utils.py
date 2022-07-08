@@ -212,7 +212,7 @@ def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5):
             trainingSet=np.hstack(trainingSet)
             labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
             
-            model.train(trainingSet, labelsOfTrainingSet, C)
+            model.train(trainingSet, labelsOfTrainingSet, C, pi_t = pi_T)
             scores.append(model.predictAndGetScores(evaluationSet))
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
