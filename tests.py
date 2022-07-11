@@ -40,30 +40,37 @@ D_train7 = PCA.compute_PCA(D_train, 7)
 # print('Linear SVM (pi_t=0.1) --> ', utils.KFoldSVM(D_train7, L_train, model, C=1e-3, K=3, prior=0.5, pi_T=0.1))
 
 
-M = 8
-model_full = GaussianMixtureModels.GMM()
-model_diag = GaussianMixtureModels.GMMDiag()
-model_tied = GaussianMixtureModels.GMMTiedCov()
+# M = 8
+# model_full = GaussianMixtureModels.GMM()
+# model_diag = GaussianMixtureModels.GMMDiag()
+# model_tied = GaussianMixtureModels.GMMTiedCov()
+    
+# print('\tK-Fold approach\n')
+# print('\t\tZ-norm | no PCA')
 
-print('\tK-Fold approach\n')
-print('\t\tZ-norm | no PCA')
+# print('Full-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_full, K=3, M=M))
+# print('Diag-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_diag, K=3, M=M))
+# print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_tied, K=3, M=M))
 
-print('Full-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_full, K=3, M=M))
-print('Diag-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_diag, K=3, M=M))
-print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train, L_train, model_tied, K=3, M=M))
+# print('\t\tZ-norm | PCA(m=7)')
 
-print('\t\tZ-norm | PCA(m=7)')
-
-print('Full-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_full, K=3, M=M))
-print('Diag-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_diag, K=3, M=M))
-print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_tied, K=3, M=M))
-
-
+# print('Full-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_full, K=3, M=M))
+# print('Diag-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_diag, K=3, M=M))
+# print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_tied, K=3, M=M))
 
 
 
 
 
+# print('A')
+# hyperparameter_tuning.balanced_poly_SVM_tuning(D_train, L_train, mode='KFold')
+# print('B')
+# hyperparameter_tuning.balanced_poly_SVM_tuning(D_train7, L_train, mode='KFold')
+
+# print('C')
+# hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train, L_train, mode='KFold')
+# print('D')
+# hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train7, L_train, mode='KFold')
 
 
 
@@ -72,8 +79,8 @@ print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_tied, K=3, M=
 
 
 
-
-
+hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train, L_train, mode='KFold')
+hyperparameter_tuning.balanced_RBF_SVM_tuning(D_train7, L_train, mode='KFold')
 
 
 

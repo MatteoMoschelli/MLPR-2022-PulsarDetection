@@ -9,7 +9,6 @@ import EM_Algorithm
 import numpy as np
 
 def split(GMM, alpha = 0.1):
-    
     size = len(GMM)
     splittedGMM = []
     for i in range(size):
@@ -36,16 +35,32 @@ def LBG(GMM, X, iterations):
     return GMM
 
 def DiagLBG(GMM, X, iterations):
-    GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
-    for i in range(iterations):
+    # GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
+    # for i in range(iterations):
+    #     GMM = split(GMM)
+    #     GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
+    while True:
         GMM = split(GMM)
+        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
+        
+        if(len(GMM) >= iterations):
+            break
     return GMM
 
 
 def TiedLBG(GMM, X, iterations):
-    GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
-    for i in range(iterations):
+    # GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
+    # for i in range(iterations):
+    #     GMM = split(GMM)
+    #     GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
+    # return GMM
+    
+    while True:
         GMM = split(GMM)
+        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
+        
+        if(len(GMM) >= iterations):
+            break
     return GMM

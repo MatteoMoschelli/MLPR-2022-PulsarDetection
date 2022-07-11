@@ -9,6 +9,7 @@ import numpy as np
 from scipy.stats import norm
 import metrics
 from tqdm import tqdm
+import LogisticRegression
 
 # -------------------- CONSTANTS ---------------------
 
@@ -131,7 +132,7 @@ def split_db_KFold(D, L, seed=0, K=5):
     return folds, labels
 
 # Apply KFold cross-validation on the input model with the input dataset
-def KFold(D, L, model, K=3, prior=0.5):
+def KFold(D, L, model, K=3, prior=0.5, computeActDCF=False, calibrateScores=False, train=True):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         
@@ -150,22 +151,31 @@ def KFold(D, L, model, K=3, prior=0.5):
             LTE.append(labels[i])
             DTR = np.hstack(DTR)
             LTR = np.hstack(LTR)
-            model.train(DTR, LTR)
+            if train:
+                model.train(DTR, LTR)
             scores.append(model.predictAndGetScores(DTE))
         
         scores = np.hstack(scores)
-        LTE = np.hstack(LTE)
         labels = np.hstack(labels)
         
-        minDCF = []
-        for prior in priors:
-            minDCF.append(metrics.compute_minDCF(scores, LTE, prior, 1, 1))
-        return minDCF
+        if calibrateScores:
+            scores = calibrateScores(scores, labels, 1e-4)        
+        
+        if computeActDCF:   # return actDCF
+            actDCF = []
+            for prior in priors:
+                actDCF.append(metrics.compute_actDCF(scores, labels, prior, 1, 1))
+            return actDCF
+        else:               # return minDCF instead
+            minDCF = []
+            for prior in priors:
+                minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+            return minDCF
     else:
         print("K cannot be <=1")
     return
 
-def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
+def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, calibrateScores=False, train=True):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -181,21 +191,31 @@ def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5):
             orderedLabels.append(labels[i])
             trainingSet=np.hstack(trainingSet)
             labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
-            model.train(trainingSet, labelsOfTrainingSet, lambd, pi_T)
+            if train:
+                model.train(trainingSet, labelsOfTrainingSet, lambd, pi_T)
             scores.append(model.predictAndGetScores(evaluationSet))
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        minDCF = []
-        for prior in priors:
-            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
-        return minDCF
+        if calibrateScores:
+            scores = calibrateScores(scores, labels, 1e-4)
+        
+        if computeActDCF:   # return actDCF
+            actDCF = []
+            for prior in priors:
+                actDCF.append(metrics.compute_actDCF(scores, labels, prior, 1, 1))
+            return actDCF
+        else:               # return minDCF instead
+            minDCF = []
+            for prior in priors:
+                minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+            return minDCF
     else:
         print("K cannot be <=1")
     return
 
-def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5):
+def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, calibrateScores=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -212,21 +232,31 @@ def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5):
             trainingSet=np.hstack(trainingSet)
             labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
             
-            model.train(trainingSet, labelsOfTrainingSet, C, pi_t = pi_T)
+            if train:
+                model.train(trainingSet, labelsOfTrainingSet, C, pi_t = pi_T)
             scores.append(model.predictAndGetScores(evaluationSet))
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        minDCF = []
-        for prior in priors:
-            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
-        return minDCF
+        if calibrateScores:
+            scores = calibrateScores(scores, labels, 1e-4)
+        
+        if computeActDCF:   # return actDCF
+            actDCF = []
+            for prior in priors:
+                actDCF.append(metrics.compute_actDCF(scores, labels, prior, 1, 1))
+            return actDCF
+        else:               # return minDCF instead
+            minDCF = []
+            for prior in priors:
+                minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+            return minDCF
     else:
         print("K cannot be <= 1")
         return 
 
-def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0):
+def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0, computeActDCF=False, calibrateScores=False, tuning=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -243,21 +273,34 @@ def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, 
             trainingSet=np.hstack(trainingSet)
             labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
             
-            model.train(trainingSet, labelsOfTrainingSet, kernel='poly', C=C, c=c, p_t=pi_T)
+            if train:
+                model.train(trainingSet, labelsOfTrainingSet, kernel=kernel, C=C, c=c, p_t=pi_T, gamma=gamma)
             scores.append(model.predictAndGetScores(evaluationSet))
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        minDCF = []
-        for prior in priors:
-            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
-        return minDCF
+        if calibrateScores:
+            scores = calibrateScores(scores, labels, 1e-4)
+        
+        if tuning:
+            return metrics.compute_minDCF(scores, labels, prior, 1, 1)
+        else:
+            if computeActDCF:   # return actDCF
+                actDCF = []
+                for prior in priors:
+                    actDCF.append(metrics.compute_actDCF(scores, labels, prior, 1, 1))
+                return actDCF
+            else:               # return minDCF instead
+                minDCF = []
+                for prior in priors:
+                    minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+                return minDCF
     else:
         print("K cannot be <= 1")
         return 
 
-def KFoldGMM(D, L, model, K=3, M=1, prior=0.5):
+def KFoldGMM(D, L, model, K=3, M=1, prior=0.5, computeActDCF=False, calibrateScores=False, tuning=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -274,16 +317,26 @@ def KFoldGMM(D, L, model, K=3, M=1, prior=0.5):
             trainingSet=np.hstack(trainingSet)
             labelsOfTrainingSet=np.hstack(labelsOfTrainingSet)
             
-            model.train(trainingSet, labelsOfTrainingSet, M)
+            if train:
+                model.train(trainingSet, labelsOfTrainingSet, M)
             scores.append(model.predictAndGetScores(evaluationSet))
         scores=np.hstack(scores)
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        minDCF = []
-        for prior in priors:
-            minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
-        return minDCF
+        if calibrateScores:
+            scores = calibrateScores(scores, labels, 1e-4)
+        
+        if computeActDCF:   # return actDCF
+            actDCF = []
+            for prior in priors:
+                actDCF.append(metrics.compute_actDCF(scores, labels, prior, 1, 1))
+            return actDCF
+        else:               # return minDCF instead
+            minDCF = []
+            for prior in priors:
+                minDCF.append(metrics.compute_minDCF(scores, labels, prior, 1, 1))
+            return minDCF
     else:
         print("K cannot be <= 1")
         return
@@ -295,3 +348,14 @@ def shuffle_data(D, L, seed = 0):
     idx = np.random.permutation(D.shape[1])
     
     return D[:, idx], L[idx]
+
+def calibrateScores(s, L, calib_lambda, prior=0.5):
+    # f(s) = as+b can be interpreted as the llr for the two class hypothesis
+    # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
+    s = vrow(s)
+    lr = LogisticRegression.LinearLR()
+    lr.train(s, L, calib_lambda, prior=prior)
+    alpha = lr.x[0]
+    betafirst = lr.x[1]
+    calibScores = alpha*s+betafirst-np.log(prior/(1-prior))
+    return calibScores

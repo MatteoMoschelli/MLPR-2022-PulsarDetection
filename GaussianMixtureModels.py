@@ -69,7 +69,7 @@ class GMMTiedCov():
         
         C0 = np.cov(D0)
         C1 = np.cov(D1)
-        self.C = 1/(D.shape[1]) * (D0.shape[1] * self.C0 + D1.shape[1] * self.C1)
+        self.C = 1/(D.shape[1]) * (D0.shape[1] * C0 + D1.shape[1] * C1)
         
         GMM0_init = [(1.0, utils.vcol(D0.mean(axis=1)), self.C)]
         GMM1_init = [(1.0, utils.vcol(D1.mean(axis=1)), self.C)]
@@ -78,7 +78,6 @@ class GMMTiedCov():
         self.GMM1 = LBG_Algorithm.TiedLBG(GMM1_init, D1, M)
         
     def predictAndGetScores(self, X):
-        
         LS0 = GMM_loglikelihood(X, self.GMM0)
         LS1 = GMM_loglikelihood(X, self.GMM1)
         

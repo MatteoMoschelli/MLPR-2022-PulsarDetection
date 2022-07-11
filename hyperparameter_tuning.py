@@ -153,7 +153,7 @@ def balanced_poly_SVM_tuning(D, L, mode='singleFold'):
     c_params = [0, 1, 10]
     
     if mode == 'KFold':
-        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='poly', C=C, K=3, prior=0.5, c=c_i) for c_i in c_params], C) for C in tqdm(C_params)], dtype=object)
+        minDCF = np.array([([utils.KFoldSVM_kernel(D, L, model, kernel='poly', C=C, K=3, prior=0.5, c=c_i, tuning=True) for c_i in c_params], C) for C in tqdm(C_params)], dtype=object)
 
     
         y0 = [minDCF[i][0][0] for i in range(len(C_params))]

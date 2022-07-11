@@ -46,6 +46,7 @@ def plotDCF(x, y, x_label, y_label):
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.legend(["minDCF (pi=0.5)", "minDCF (pi=0.9)", "minDCF (pi=0.1)"])
+    plt.show()
 
 def plotDCF_poly(x, y, xlabel, ylabel):
     plt.figure()
@@ -57,6 +58,7 @@ def plotDCF_poly(x, y, xlabel, ylabel):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.legend(["minDCF (pi=0.5) c=0.1", "minDCF (pi=0.5) c=1", "minDCF (pi=0.5) c=10"])
+    plt.show()
     
 def plotDCF_RBF(x, y, xlabel, ylabel):
     plt.figure()
@@ -68,6 +70,7 @@ def plotDCF_RBF(x, y, xlabel, ylabel):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.legend(["minDCF (pi=0.5) logγ=-5", "minDCF (pi=0.5) logγ=-4", "minDCF (pi=0.5) logγ=-3"])
+    plt.show()
     
 def plotDCF_GMM(x, y0, y1, y2, xlabel, ylabel):
     labels = ["2","4","8","16","32","64"]
