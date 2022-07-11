@@ -277,8 +277,8 @@ print('Linear SVM (pi_t=0.1) --> ', utils.KFoldSVM(D_train7, L_train, model, C=l
 
 print('Starting polynomial kernel SVM analysis:\n')
 
-# hyperparameter_tuning.balanced_poly_SVM_tuning(D_train, L_train, mode='KFold')
-# hyperparameter_tuning.balanced_poly_SVM_tuning(D_train7, L_train, mode='KFold')
+hyperparameter_tuning.balanced_poly_SVM_tuning(D_train, L_train, mode='KFold')
+hyperparameter_tuning.balanced_poly_SVM_tuning(D_train7, L_train, mode='KFold')
 
 poly_SVM_c = 10
 poly_SVM_C = 1e-5
@@ -337,6 +337,26 @@ print('Tied-Cov GMM --> ', utils.KFoldGMM(D_train7, L_train, model_tied, K=3, M=
 
 #### ACTUAL DCF + SCORE CALIBRATION
 
+print('Evaluating actDCF for best 3 models over training set')
+print('\tK-Fold approach\n')
+
+# print('\t\tZ-norm | PCA(m=7)')
+# print('\t\t\tTied covariance MVG (no calibration) --> ', utils.KFold(D_train7, L_train, GaussianClassifiers.GaussianClassifier_TiedCovariances(), computeActDCF=True))
+# print('\t\t\tTied covariance MVG (after calibration) --> ', utils.KFold(D_train7, L_train, GaussianClassifiers.GaussianClassifier_TiedCovariances(), scoreCalibration=True, computeActDCF=True))
+
+# print('\t\tZ-norm | PCA(m=7)')
+# linear_LR_lambda = 1e-5
+# model_linearLR = LogisticRegression.LinearLR()
+# print('\t\t\tLinear LR (λ=1e-5, no calibration) --> ', utils.KFoldLR(D_train7, L_train, model_linearLR, linear_LR_lambda, computeActDCF=True))
+# print('\t\t\tLinear LR (λ=1e-5, after calibration) --> ', utils.KFoldLR(D_train7, L_train, model_linearLR, linear_LR_lambda, scoreCalibration=True, computeActDCF=True))
+
+print('\t\tZ-norm | no PCA')
+GMM_M = 8
+model_full = GaussianMixtureModels.GMM()
+# print('Full-Cov GMM (no calibration) --> ', utils.KFoldGMM(D_train, L_train, model_full, K=3, M=GMM_M, computeActDCF=True))
+print('Full-Cov GMM (after calibration) --> ', utils.KFoldGMM(D_train7, L_train, model_full, K=3, M=GMM_M, scoreCalibration=True, computeActDCF=True))
+
+"""
 print('\t\t\t\tTEST SET\n')
 
 D_test, L_test = utils.load('data/Test.txt')
@@ -418,8 +438,88 @@ model_quadraticLR.train(D_train7, L_train, quadratic_LR_lambda)
 print('\t\t\tQuadratic LR (λ=1e-5) --> ', utils.KFoldLR(D_test7, L_test, model_quadraticLR, quadratic_LR_lambda, train=False))
 
 
+print('Starting linear SVM analysis:\n')
+
+linear_SVM_C = 1e-3
+print('Selected value for C (linear SVM): ', linear_SVM_C)
+
+print('\tK-Fold approach\n')
+print('\t\tZ-norm | no PCA')
+
+model = SupportVectorMachines.BalancedLinearSVM()
+model.train(D_train, L_train, linear_SVM_C, p_t=0.9)
+print('Linear SVM (pi_t=0.9) --> ', utils.KFoldSVM(D_test, L_test, model, C=linear_SVM_C, K=3, train=False))
+model.train(D_train, L_train, linear_SVM_C, p_t=0.5)
+print('Linear SVM (pi_t=0.5) --> ', utils.KFoldSVM(D_test, L_test, model, C=linear_SVM_C, K=3, train=False))
+model.train(D_train, L_train, linear_SVM_C, p_t=0.1)
+print('Linear SVM (pi_t=0.1) --> ', utils.KFoldSVM(D_test, L_test, model, C=linear_SVM_C, K=3, train=False))
+
+print('\t\tZ-norm | PCA(m=7)')
+
+model = SupportVectorMachines.BalancedLinearSVM()
+model.train(D_train7, L_train, linear_SVM_C, p_t=0.9)
+print('Linear SVM (pi_t=0.9) --> ', utils.KFoldSVM(D_test7, L_test, model, C=linear_SVM_C, K=3, train=False))
+model.train(D_train7, L_train, linear_SVM_C, p_t=0.5)
+print('Linear SVM (pi_t=0.5) --> ', utils.KFoldSVM(D_test7, L_test, model, C=linear_SVM_C, K=3, train=False))
+model.train(D_train7, L_train, linear_SVM_C, p_t=0.1)
+print('Linear SVM (pi_t=0.1) --> ', utils.KFoldSVM(D_test7, L_test, model, C=linear_SVM_C, K=3, train=False))
 
 
+print('Starting polynomial kernel SVM analysis:\n')
+
+poly_SVM_c = 10
+poly_SVM_C = 1e-5
+print('Selected values for polynomial SVM --> C: ', poly_SVM_C, ' c: ', poly_SVM_c)
+
+model = SupportVectorMachines.BalancedQuadraticSVM()
+model.train(D_train, L_train, kernel='poly', C=poly_SVM_C, c=poly_SVM_c)
+print('Polynomial SVM (C=1e-5, c=10) --> ', utils.KFoldSVM_kernel(D_test, L_test, model, kernel='poly', C=poly_SVM_C, K=3, c=poly_SVM_c, train=False))
+model.train(D_train7, L_train, kernel='poly', C=poly_SVM_C, c=poly_SVM_c)
+print('Polynomial SVM (C=1e-5, c=10) --> ', utils.KFoldSVM_kernel(D_test7, L_test, model, kernel='poly', C=poly_SVM_C, K=3, c=poly_SVM_c, train=False))
+
+
+print('Starting RBF kernel SVM analysis:\n')
+
+RBF_SVM_C = 1e-1
+RBF_SVM_gamma = 1e-3
+
+print('Selected values for RBF SVM --> C: ', RBF_SVM_C, ' gamma: ', RBF_SVM_gamma)
+
+model = SupportVectorMachines.BalancedQuadraticSVM()
+model.train(D_train, L_train, kernel='RBF', C=RBF_SVM_C, gamma=RBF_SVM_gamma)
+print('RBF kernel SVM (C=1e-1, gamma=1e-3) --> ', utils.KFoldSVM_kernel(D_test, L_test, model, kernel='RBF', C=RBF_SVM_C, K=3, gamma=RBF_SVM_gamma, train=False))
+model.train(D_train7, L_train, kernel='RBF', C=RBF_SVM_C, gamma=RBF_SVM_gamma)
+print('RBF kernel SVM (C=1e-1, gamma=1e-3) --> ', utils.KFoldSVM_kernel(D_test7, L_test, model, kernel='RBF', C=RBF_SVM_C, K=3, gamma=RBF_SVM_gamma, train=False))
+
+
+print('Starting GMM analysis:\n')
+
+GMM_M = 8
+print('Selected value for M: ', GMM_M)
+
+model_full = GaussianMixtureModels.GMM()
+model_diag = GaussianMixtureModels.GMMDiag()
+model_tied = GaussianMixtureModels.GMMTiedCov()
+    
+print('\tK-Fold approach\n')
+print('\t\tZ-norm | no PCA')
+
+model_full.train(D_train, L_train, GMM_M)
+model_diag.train(D_train, L_train, GMM_M)
+model_tied.train(D_train, L_train, GMM_M)
+print('Full-Cov GMM --> ', utils.KFoldGMM(D_test, L_test, model_full, K=3, M=GMM_M, train=False))
+print('Diag-Cov GMM --> ', utils.KFoldGMM(D_test, L_test, model_diag, K=3, M=GMM_M, train=False))
+print('Tied-Cov GMM --> ', utils.KFoldGMM(D_test, L_test, model_tied, K=3, M=GMM_M, train=False))
+
+print('\t\tZ-norm | PCA(m=7)')
+
+model_full.train(D_train7, L_train, GMM_M)
+model_diag.train(D_train7, L_train, GMM_M)
+model_tied.train(D_train7, L_train, GMM_M)
+print('Full-Cov GMM --> ', utils.KFoldGMM(D_test7, L_test, model_full, K=3, M=GMM_M, train=False))
+print('Diag-Cov GMM --> ', utils.KFoldGMM(D_test7, L_test, model_diag, K=3, M=GMM_M, train=False))
+print('Tied-Cov GMM --> ', utils.KFoldGMM(D_test7, L_test, model_tied, K=3, M=GMM_M, train=False))
+"""
 # test set analysis
 ## minDCF
 #### MVG

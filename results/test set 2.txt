@@ -1,0 +1,62 @@
+PULSAR DETECTION
+
+TRAINING SET
+
+Training Dataset loaded
+
+Applied z-normalization
+Applied PCA with m=7, m=6, m=5
+
+TEST SET
+
+Test Dataset loaded
+
+Applied z-normalization
+Applied PCA with m=7
+
+Starting linear SVM analysis:
+
+Selected value for C (linear SVM):  0.001
+K-Fold approach
+
+Z-norm | no PCA
+Linear SVM (pi_t=0.9) -->  [0.15, 0.605, 0.302]
+Linear SVM (pi_t=0.5) -->  [0.144, 0.603, 0.282]
+Linear SVM (pi_t=0.1) -->  [0.165, 0.602, 0.31]
+Z-norm | PCA(m=7)
+Linear SVM (pi_t=0.9) -->  [0.151, 0.601, 0.305]
+Linear SVM (pi_t=0.5) -->  [0.146, 0.599, 0.284]
+Linear SVM (pi_t=0.1) -->  [0.165, 0.602, 0.313]
+
+
+Starting polynomial kernel SVM analysis:
+
+Selected values for polynomial SVM --> C:  1e-05  c:  10
+Z-norm | no PCA
+Polynomial SVM (C=1e-5, c=10) -->  [0.18, 0.613, 0.349]
+Z-norm | PCA(m=7)
+Polynomial SVM (C=1e-5, c=10) -->  [0.18, 0.609, 0.352]
+
+
+Starting RBF kernel SVM analysis:
+
+Selected values for RBF SVM --> C:  0.1  gamma:  0.001
+Z-norm | no PCA
+RBF kernel SVM (C=1e-1, gamma=1e-3) -->  [0.181, 0.828, 0.263]
+Z-norm | PCA(m=7)
+RBF kernel SVM (C=1e-1, gamma=1e-3) -->  [0.183, 0.844, 0.262]
+
+
+Starting GMM analysis:
+
+Selected value for M:  8
+K-Fold approach
+
+Z-norm | no PCA
+Full-Cov GMM -->  [0.109, 0.563, 0.223]
+Diag-Cov GMM -->  [0.131, 0.546, 0.261]
+Tied-Cov GMM -->  [0.143, 0.602, 0.3]
+Z-norm | PCA(m=7)
+Full-Cov GMM -->  [0.116, 0.519, 0.239]
+Diag-Cov GMM -->  [0.118, 0.538, 0.237]
+Tied-Cov GMM -->  [0.135, 0.617, 0.296]

@@ -20,14 +20,9 @@ def split(GMM, alpha = 0.1):
     return splittedGMM
 
 def LBG(GMM, X, iterations):
-    # GMM = EM_Algorithm.EMalgorithm(X, GMM)
-    # for i in range(iterations):
-    #     GMM = split(GMM)
-    #     print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
-    #     GMM = EM_Algorithm.EMalgorithm(X, GMM)
     while True:
         GMM = split(GMM)
-        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
+        #print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.EMalgorithm(X, GMM)
         
         if(len(GMM) >= iterations):
@@ -35,13 +30,9 @@ def LBG(GMM, X, iterations):
     return GMM
 
 def DiagLBG(GMM, X, iterations):
-    # GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
-    # for i in range(iterations):
-    #     GMM = split(GMM)
-    #     GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
     while True:
         GMM = split(GMM)
-        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
+        #print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.DiagEMalgorithm(X, GMM)
         
         if(len(GMM) >= iterations):
@@ -49,16 +40,10 @@ def DiagLBG(GMM, X, iterations):
     return GMM
 
 
-def TiedLBG(GMM, X, iterations):
-    # GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
-    # for i in range(iterations):
-    #     GMM = split(GMM)
-    #     GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
-    # return GMM
-    
+def TiedLBG(GMM, X, iterations):    
     while True:
         GMM = split(GMM)
-        print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
+        #print("\t\tM = " + str(len(GMM)) + "/"+str(iterations))
         GMM = EM_Algorithm.TiedEMalgorithm(X, GMM)
         
         if(len(GMM) >= iterations):

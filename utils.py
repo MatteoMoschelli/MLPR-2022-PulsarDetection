@@ -132,7 +132,7 @@ def split_db_KFold(D, L, seed=0, K=5):
     return folds, labels
 
 # Apply KFold cross-validation on the input model with the input dataset
-def KFold(D, L, model, K=3, prior=0.5, computeActDCF=False, calibrateScores=False, train=True):
+def KFold(D, L, model, K=3, prior=0.5, computeActDCF=False, scoreCalibration=False, train=True):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         
@@ -158,7 +158,7 @@ def KFold(D, L, model, K=3, prior=0.5, computeActDCF=False, calibrateScores=Fals
         scores = np.hstack(scores)
         labels = np.hstack(labels)
         
-        if calibrateScores:
+        if scoreCalibration:
             scores = calibrateScores(scores, labels, 1e-4)        
         
         if computeActDCF:   # return actDCF
@@ -175,7 +175,7 @@ def KFold(D, L, model, K=3, prior=0.5, computeActDCF=False, calibrateScores=Fals
         print("K cannot be <=1")
     return
 
-def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, calibrateScores=False, train=True):
+def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, scoreCalibration=False, train=True):
     if (K>1):
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -198,7 +198,7 @@ def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, c
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        if calibrateScores:
+        if scoreCalibration:
             scores = calibrateScores(scores, labels, 1e-4)
         
         if computeActDCF:   # return actDCF
@@ -215,7 +215,7 @@ def KFoldLR(D, L, model, lambd, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, c
         print("K cannot be <=1")
     return
 
-def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, calibrateScores=False, train=True):
+def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, scoreCalibration=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -239,7 +239,7 @@ def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, cali
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        if calibrateScores:
+        if scoreCalibration:
             scores = calibrateScores(scores, labels, 1e-4)
         
         if computeActDCF:   # return actDCF
@@ -256,7 +256,7 @@ def KFoldSVM(D, L, model, C, K=3, prior=0.5, pi_T=0.5, computeActDCF=False, cali
         print("K cannot be <= 1")
         return 
 
-def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0, computeActDCF=False, calibrateScores=False, tuning=False, train=True):
+def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, gamma=1.0, computeActDCF=False, scoreCalibration=False, tuning=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -280,7 +280,7 @@ def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, 
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        if calibrateScores:
+        if scoreCalibration:
             scores = calibrateScores(scores, labels, 1e-4)
         
         if tuning:
@@ -300,7 +300,7 @@ def KFoldSVM_kernel(D, L, model, kernel, C, K=3, prior=0.5, pi_T=0.5, c=0, d=2, 
         print("K cannot be <= 1")
         return 
 
-def KFoldGMM(D, L, model, K=3, M=1, prior=0.5, computeActDCF=False, calibrateScores=False, tuning=False, train=True):
+def KFoldGMM(D, L, model, K=3, M=1, prior=0.5, computeActDCF=False, scoreCalibration=False, tuning=False, train=True):
     if K > 1:
         folds, labels = split_db_KFold(D, L, seed=0, K=K)
         orderedLabels = []
@@ -324,7 +324,7 @@ def KFoldGMM(D, L, model, K=3, M=1, prior=0.5, computeActDCF=False, calibrateSco
         orderedLabels=np.hstack(orderedLabels)
         labels = np.hstack(labels)
         
-        if calibrateScores:
+        if scoreCalibration:
             scores = calibrateScores(scores, labels, 1e-4)
         
         if computeActDCF:   # return actDCF

@@ -55,10 +55,9 @@ def compute_minDCF(llr, LTE, pi1, cfn, cfp):
     return round(NDCF[index],3)
 
 def compute_actDCF(llr, LTE, pi1, cfn, cfp):
-    
     predictions = (llr > (-np.log(pi1/(1-pi1)))).astype(int)
     
-    confMatrix =  confusionMatrix(predictions, LTE, LTE.max()+1)
+    confMatrix =  confusionMatrix(predictions.ravel(), LTE, LTE.max()+1)
     uDCF = detection_cost_function(confMatrix, pi1, cfn, cfp)
         
     NDCF=(normalized_detection_cost_function(uDCF, pi1, cfn, cfp))

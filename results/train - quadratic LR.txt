@@ -1,0 +1,9 @@
+Starting quadratic Logistic Regression analysis:
+
+Selected value for lambda (quadratic LR):  1e-05
+  K-Fold approach
+
+    Z-norm | no PCA
+      Quadratic LR (λ=1e-5) -->  [0.117, 0.5, 0.216]
+    Z-norm | PCA(m=7)
+      Quadratic LR (λ=1e-5) -->  [0.115, 0.5, 0.216]
